@@ -23,7 +23,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
+from fastapi.middleware.cors import CORSMiddleware
 from database import init_tables, close_pool, save_message, search_memories, save_memory, get_all_memories_count, get_recent_memories, get_all_memories, get_pool, get_all_memories_detail, update_memory, delete_memory, delete_memories_batch, get_gateway_config, set_gateway_config, get_all_gateway_config, get_conversation_messages, get_session_cache_state, save_session_cache_state, delete_session_cache_state, save_token_usage, ensure_token_usage_table, ensure_conversation_titles_table, get_conversations_paginated, delete_conversation, batch_delete_conversations, merge_sessions_to_target, list_all_session_cache_states, export_all_conversations, import_conversations, get_last_user_content, update_last_assistant_message, db_row_to_message, backfill_memory_embeddings, get_pending_memory_embedding_count, search_conversations, update_message_content, rename_session_id, get_fragments_by_date, get_fragments_by_date_range, create_event_memory, deactivate_memories, promote_to_core, merge_memories, check_duplicate_memory, update_memory_with_layer, get_layer_statistics, cleanup_old_fragments, revert_merge
 import database as _db_module  # 用于 /api/settings 热更新 database.py 全局变量
 from memory_extractor import extract_memories, score_memories
@@ -227,12 +227,17 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AI Memory Gateway", version="2.0.0", lifespan=lifespan)
-
+ app.add_middleware(
+     
 # 静态文件和模板配置
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-
-
+ app.add_middleware(                                                                                                                                                                  CORSMiddleware,                                                                                                                                                                  allow_origins=["*"],                                                                                                                                                             allow_methods=["*"],                                                                                                                                                             allow_headers=["*"],  
+ CORSMiddleware,
+  allow_origins=["*"]
+ allow_methods=["*"],
+ allow_headers=["*"],
+  ) 
 # ============================================================
 # 记忆注入
 # ============================================================
